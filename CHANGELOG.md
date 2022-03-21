@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.0.1
+**Fix:** broken import
+
 ## v2.0.0 - Binary default
 Don't base64 encode encrypted messages by default.
 

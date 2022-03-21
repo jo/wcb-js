@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import * as wcb from '../webcryptobox-js/index.js'
+import * as wcb from 'webcryptobox'
 
 import _yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'

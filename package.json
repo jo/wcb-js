@@ -1,7 +1,7 @@
 {
   "name": "wcbjs",
   "description": "CLI tool for asymetric encryption with WebCrypto.",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "bin": "wcb.js",
   "type": "module",
   "keywords": [
