@@ -4,7 +4,16 @@
   "version": "1.0.0",
   "bin": "wcb.js",
   "type": "module",
-  "keywords": ["WebCrypto", "crypto", "subtle", "encryption", "decryption", "nacl", "e2ee", "cli"],
+  "keywords": [
+    "WebCrypto",
+    "crypto",
+    "subtle",
+    "encryption",
+    "decryption",
+    "nacl",
+    "e2ee",
+    "cli"
+  ],
   "author": "Johannes J. Schmidt",
   "license": "Apache-2.0",
   "repository": {
