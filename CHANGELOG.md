@@ -1,6 +1,6 @@
 # Changelog
 
-## v2.0.0
+## v2.0.0 - Binary default
 Don't base64 encode encrypted messages by default.
 
 **Breaking change:**
