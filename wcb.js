@@ -8,6 +8,25 @@ const yargs = _yargs(hideBin(process.argv))
 
 import { readFileSync, existsSync } from 'fs'
 
+const readData = (filename, base64) => {
+  const path = filename === '-' ? 0 : filename
+  if (base64) {
+    const boxBase64 = readFileSync(path, { encoding:'utf8' })
+    return wcb.decodeBase64(boxBase64)
+  } else {
+    return readFileSync(path)
+  }
+}
+
+const writeData = (data, base64) => {
+  if (base64) {
+    const dataBase64 = wcb.encodeBase64(data)
+    console.log(dataBase64)
+  } else {
+    process.stdout.write(data)
+  }
+}
+
 yargs
   .usage('$0 <command> [options]')
 
@@ -28,6 +47,12 @@ yargs
       default: '-',
       describe: 'filename of message content'
     })
+    .option('base64', {
+      alias: 'b',
+      type: 'boolean',
+      default: false,
+      describe: 'Base64 encode encrypted message'
+    })
     .check(argv => {
       if (!argv.key.match(/^[0-9a-f]{64}$/)) {
         throw new Error('key must be a 64 digit hex string')
@@ -42,8 +67,7 @@ yargs
       const filename = argv.filename === '-' ? 0 : argv.filename
       const message = readFileSync(filename)
       const box = await wcb.encrypt({ key, message })
-      const boxBase64 = wcb.encodeBase64(box)
-      console.log(boxBase64)
+      writeData(box, argv.base64)
     })
 
   .command('decrypt <key> [filename]', 'Decrypt box. Box either read from "filename" or STDIN.', yargs => yargs
@@ -56,6 +80,12 @@ yargs
       default: '-',
       describe: 'path to message content'
     })
+    .option('base64', {
+      alias: 'b',
+      type: 'boolean',
+      default: false,
+      describe: 'Base64 decode encrypted message'
+    })
     .check(argv => {
       if (!argv.key.match(/^[0-9a-f]{64}$/)) {
         throw new Error('key must be a 64 digit hex string')
@@ -67,9 +97,7 @@ yargs
     }), async argv => {
       const keyData = wcb.decodeHex(argv.key)
       const key = await wcb.importKey(keyData)
-      const filename = argv.filename === '-' ? 0 : argv.filename
-      const boxBase64 = readFileSync(filename, { encoding:'utf8' })
-      const box = wcb.decodeBase64(boxBase64)
+      const box = readData(argv.filename, argv.base64)
       const messageData = await wcb.decrypt({ key, box })
       const message = wcb.encodeText(messageData)
       console.log(message)
@@ -337,6 +365,12 @@ yargs
       default: '-',
       describe: 'path of message content'
     })
+    .option('base64', {
+      alias: 'b',
+      type: 'boolean',
+      default: false,
+      describe: 'Base64 encode encrypted message'
+    })
     .check(argv => {
       if (!existsSync(argv.private_key)) {
         throw new Error(`Cannot open ${argv.private_key} - does the file exist?`)
@@ -356,8 +390,7 @@ yargs
       const filename = argv.filename === '-' ? 0 : argv.filename
       const message = readFileSync(filename)
       const box = await wcb.encryptTo({ privateKey, publicKey, message })
-      const boxBase64 = wcb.encodeBase64(box)
-      console.log(boxBase64)
+      writeData(box, argv.base64)
     })
 
   .command('decrypt-from <private_key> <public_key> [filename]', 'Decrypt box with private and public key. Box either read from "filename" or STDIN.', yargs => yargs
@@ -373,6 +406,12 @@ yargs
       type: 'string',
       default: '-',
       describe: 'path to message content'
+    })
+    .option('base64', {
+      alias: 'b',
+      type: 'boolean',
+      default: false,
+      describe: 'Base64 decode encrypted message'
     })
     .check(argv => {
       if (!existsSync(argv.private_key)) {
@@ -390,9 +429,7 @@ yargs
       const publicKeyPem = readFileSync(argv.public_key, { encoding:'utf8' })
       const privateKey = await wcb.importPrivateKeyPem(privateKeyPem)
       const publicKey = await wcb.importPublicKeyPem(publicKeyPem)
-      const filename = argv.filename === '-' ? 0 : argv.filename
-      const boxBase64 = readFileSync(filename, { encoding:'utf8' })
-      const box = wcb.decodeBase64(boxBase64)
+      const box = readData(argv.filename, argv.base64)
       const messageData = await wcb.decryptFrom({ privateKey, publicKey, box })
       const message = wcb.encodeText(messageData)
       console.log(message)
